@@ -1,16 +1,35 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// frontend2/src/App.js
+import React, { useState, useEffect } from 'react';
+import io from 'socket.io-client';
 
-function App() {
-  const [count, setCount] = useState(0)
+const socket = io('http://localhost:5000');
+
+const App = () => {
+  const [message, setMessage] = useState('');
+  const [receivedMessage, setReceivedMessage] = useState('');
+
+  const sendMessage = () => {
+    socket.emit('send_message', { message });
+  };
+
+  useEffect(() => {
+    socket.on('receive_message', (data) => {
+      setReceivedMessage(data.message);
+    });
+  }, []);
 
   return (
-    <>
-      User 02
-    </>
-  )
-}
+    <div className="App">
+      <h2>Frontend App 2</h2>
+      <input
+        type="text"
+        placeholder="Message"
+        onChange={(e) => setMessage(e.target.value)}
+      />
+      <button onClick={sendMessage}>Send</button>
+      <p>Received: {receivedMessage}</p>
+    </div>
+  );
+};
 
-export default App
+export default App;
